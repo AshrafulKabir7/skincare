@@ -1,0 +1,234 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection Results</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url("{% static 'images/skin.jpg' %}") no-repeat center center/cover;
+            color: #333;
+            position: relative;
+            height: 100vh;
+        }
+
+        /* Overlay Effect */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            z-index: 3;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1em;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 900px;
+            margin: 120px auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            font-size: 1.6em;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
+
+        .card ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .card li {
+            font-size: 1.2em;
+            margin-bottom: 12px;
+        }
+
+        .card li strong {
+            color: #16a085;
+        }
+
+        a {
+            display: inline-block;
+            padding: 14px 25px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 30px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        a:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">Derma AI</div>
+        <nav>
+            <a href="/">Home</a>
+            <a href="#">Contact Us</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Skin Problem Detection Results</h1>
+
+        <!-- Annotated Image Section -->
+        <img src="data:image/jpeg;base64,{{ image }}" alt="Annotated Image">
+
+        <!-- Results Section in Cards -->
+        <div class="grid">
+            <!-- Predictions Card -->
+            <div class="card">
+                <h2>Predictions:</h2>
+                <ul>
+                    {% for class_name, prediction in result.predictions.items %}
+                        <li>
+                            <strong>{{ class_name }}:</strong> Confidence: {{ prediction.confidence|floatformat:2 }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Predicted Classes Card -->
+            <div class="card">
+                <h2>Predicted Classes:</h2>
+                <ul>
+                    {% for predicted_class in result.predicted_classes %}
+                        <li>{{ predicted_class }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+     <!-- Suggested Skincare Products Section -->
+<div class="grid" style="margin-top: 40px;">
+    <div class="card">
+        <h2>Suggested Skincare Products:</h2>
+        <ul>
+            {% for predicted_class in result.predicted_classes %}
+                <li>
+                    <strong>{{ predicted_class }}:</strong>
+                    {% if predicted_class == "Acne" %}
+                        Salicylic acid cleanser, Benzoyl peroxide cream, Niacinamide serum
+                    {% elif predicted_class == "Blackheads" %}
+                        Salicylic acid cleanser, Retinoid cream, Clay mask
+                    {% elif predicted_class == "Dark Spots" %}
+                        Vitamin C serum, Niacinamide serum, Retinol
+                    {% elif predicted_class == "Dry Skin" %}
+                        Rich moisturizer with ceramides, Hyaluronic acid serum, Occlusive balm
+                    {% elif predicted_class == "Eye bags" %}
+                        Caffeine-infused eye cream, Peptide serum, Retinol eye cream
+                    {% elif predicted_class == "Normal Skin" %}
+                        Lightweight moisturizer, Gentle cleanser, Sunscreen
+                    {% elif predicted_class == "Oily Skin" %}
+                        Gel-based moisturizer, Oil-control toner, Clay mask
+                    {% elif predicted_class == "Pores" %}
+                        Pore-minimizing toner, Clay mask, Niacinamide serum
+                    {% elif predicted_class == "Skin Redness" %}
+                        Calming gel, Aloe vera gel, Anti-inflammatory serum
+                    {% elif predicted_class == "Wrinkles" %}
+                        Retinol serum, Peptide cream, Sunscreen
+                    {% else %}
+                        Consult a dermatologist for personalized recommendations
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
+        <!-- Upload Another Image Link -->
+        <a href="{% url 'detect_skin_problem' %}">Upload Another Image</a>
+    </div>
+</body>
+</html>
